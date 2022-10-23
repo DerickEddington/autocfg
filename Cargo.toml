@@ -1,6 +1,6 @@
 [package]
 name = "autocfg"
-version = "1.1.0"
+version = "1.999999.999999"  # Hacked 1.x version that will never be published.
 authors = ["Josh Stone <cuviper@gmail.com>"]
 license = "Apache-2.0 OR MIT"
 repository = "https://github.com/cuviper/autocfg"
