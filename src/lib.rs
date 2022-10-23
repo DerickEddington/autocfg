@@ -86,6 +86,7 @@ pub struct AutoCfg {
     rustc_version: Version,
     target: Option<OsString>,
     no_std: bool,
+    unstable_features: bool,
     rustflags: Vec<String>,
 }
 
@@ -173,6 +174,7 @@ impl AutoCfg {
             rustc_version: rustc_version,
             target: target,
             no_std: false,
+            unstable_features: false,
         };
 
         // Sanity check with and without `std`.
@@ -185,6 +187,7 @@ impl AutoCfg {
                 stderr().write_all(warning).ok();
             }
         }
+        ac.unstable_features = true;
         Ok(ac)
     }
 
@@ -226,6 +229,20 @@ impl AutoCfg {
         let mut child = try!(command.spawn().map_err(error::from_io));
         let mut stdin = child.stdin.take().expect("rustc stdin");
 
+        if self.unstable_features {
+            try!(stdin.write_all(b"#![allow(stable_features)]
+                                   #![feature(
+                                        arbitrary_self_types,
+                                        cfg_version,
+                                        destructuring_assignment,
+                                        inner_deref,
+                                        iter_zip,
+                                        never_type,
+                                        question_mark,
+                                        step_trait,
+                                        unwrap_infallible,
+                                   )]\n").map_err(error::from_io));
+        }
         if self.no_std {
             try!(stdin.write_all(b"#![no_std]\n").map_err(error::from_io));
         }
